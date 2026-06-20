@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(ls *)",
-      "Bash(wsl *)"
+      "Bash(wsl *)",
+      "PowerShell(wsl -d Ubuntu-24.04 -- bash -c \"source ~/.nvm/nvm.sh && nvm use 22 && cd /home/jmakwana01/v4-new/waitloss-monitor && npm run build 2>&1\")"
     ]
   }
 }
