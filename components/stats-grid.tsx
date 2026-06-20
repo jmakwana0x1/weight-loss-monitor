@@ -1,8 +1,14 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { CountUp } from "./count-up";
 import { bmiCategory, type Stats } from "@/lib/stats";
 import Link from "next/link";
+
+const cardVariant = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] as const } },
+};
 
 function StatCard({
   label,
@@ -16,7 +22,8 @@ function StatCard({
   className?: string;
 }) {
   return (
-    <div
+    <motion.div
+      variants={cardVariant}
       className={`flex flex-col justify-between rounded-2xl border p-4 ${className}`}
       style={{
         background: "var(--glass-bg)",
@@ -29,7 +36,7 @@ function StatCard({
         {label}
       </p>
       {children}
-    </div>
+    </motion.div>
   );
 }
 
@@ -51,18 +58,27 @@ interface StatsGridProps {
   stats: Stats;
   goalWeight?: number | null;
   heightCm?: number | null;
+  targetDate?: string | null;
 }
 
-export function StatsGrid({ stats, goalWeight, heightCm }: StatsGridProps) {
+export function StatsGrid({ stats, goalWeight, heightCm, targetDate }: StatsGridProps) {
   const { currentWeight, weeklyRate, bmi, streak, daysToGoal } = stats;
   const rateColor = weeklyRate === null ? undefined : weeklyRate <= 0 ? "#22c55e" : "#ef4444";
   const bmiInfo = bmi ? bmiCategory(bmi) : null;
 
-  const goalDate = daysToGoal
+  const calcDate = daysToGoal
     ? new Date(Date.now() + daysToGoal * 86400000).toLocaleDateString("en-GB", {
         day: "numeric", month: "short", year: "numeric",
       })
     : null;
+
+  const displayDate = calcDate ?? (targetDate
+    ? new Date(targetDate).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
+    : null);
+
+  const displayDays = daysToGoal ?? (targetDate
+    ? Math.round((new Date(targetDate).getTime() - Date.now()) / 86400000)
+    : null);
 
   return (
     <section className="mb-6">
@@ -70,7 +86,12 @@ export function StatsGrid({ stats, goalWeight, heightCm }: StatsGridProps) {
         Stats
       </p>
 
-      <div className="grid grid-cols-2 gap-2">
+      <motion.div
+        className="grid grid-cols-2 gap-2"
+        variants={{ show: { transition: { staggerChildren: 0.07 } } }}
+        initial="hidden"
+        animate="show"
+      >
         {/* Current weight */}
         <StatCard label="Current weight" accent="var(--accent)" className="col-span-2">
           <div className="flex items-end gap-1">
@@ -100,9 +121,7 @@ export function StatsGrid({ stats, goalWeight, heightCm }: StatsGridProps) {
           ) : (
             <div>
               <Empty />
-              <span className="text-xs mt-1 block" style={{ color: "var(--muted)" }}>
-                Log on 2+ days
-              </span>
+              <span className="text-xs mt-1 block" style={{ color: "var(--muted)" }}>Log on 2+ days</span>
             </div>
           )}
         </StatCard>
@@ -144,18 +163,23 @@ export function StatsGrid({ stats, goalWeight, heightCm }: StatsGridProps) {
         </StatCard>
 
         {/* Goal date */}
-        <StatCard label="Goal date" className="col-span-2" accent={goalDate ? "#22c55e" : undefined}>
-          {goalDate && daysToGoal ? (
+        <StatCard label="Goal date" className="col-span-2" accent={displayDate ? "#22c55e" : undefined}>
+          {displayDate && displayDays !== null && displayDays > 0 ? (
             <div className="flex items-center justify-between">
               <div className="flex items-end gap-1">
                 <span className="text-3xl font-bold font-mono tabular-nums leading-none" style={{ color: "#22c55e" }}>
-                  <CountUp to={daysToGoal} decimals={0} duration={1000} />
+                  <CountUp to={displayDays} decimals={0} duration={1000} />
                 </span>
                 <span className="text-xs mb-1" style={{ color: "var(--muted)" }}>days left</span>
               </div>
-              <span className="text-sm font-medium" style={{ color: "rgba(255,255,255,0.5)" }}>
-                {goalDate}
-              </span>
+              <div className="flex flex-col items-end gap-0.5">
+                <span className="text-sm font-medium" style={{ color: "rgba(255,255,255,0.5)" }}>
+                  {displayDate}
+                </span>
+                {targetDate && !calcDate && (
+                  <span className="text-xs" style={{ color: "var(--muted)" }}>target date</span>
+                )}
+              </div>
             </div>
           ) : (
             <div className="flex flex-col gap-1">
@@ -170,7 +194,7 @@ export function StatsGrid({ stats, goalWeight, heightCm }: StatsGridProps) {
             </div>
           )}
         </StatCard>
-      </div>
+      </motion.div>
     </section>
   );
 }

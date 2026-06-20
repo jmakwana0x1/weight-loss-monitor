@@ -25,13 +25,13 @@ export default async function DashboardPage() {
       .limit(90),
     (supabase as any)
       .from("profiles")
-      .select("goal_weight, height_cm")
+      .select("goal_weight, height_cm, target_date")
       .eq("id", user.id)
       .maybeSingle(),
   ]);
 
   const entries: WeightEntry[] = entriesRaw ?? [];
-  const profile = profileRaw as Pick<Profile, "goal_weight" | "height_cm"> | null;
+  const profile = profileRaw as (Pick<Profile, "goal_weight" | "height_cm"> & { target_date: string | null }) | null;
 
   // First-time users must set up their profile before seeing the dashboard
   if (!profile?.height_cm || !profile?.goal_weight) {
@@ -46,7 +46,7 @@ export default async function DashboardPage() {
     <main className="min-h-screen px-4 py-8" style={{ maxWidth: 480, margin: "0 auto" }}>
       <Header email={user.email ?? ""} />
       <QuickLog lastWeight={stats.currentWeight ?? undefined} />
-      <StatsGrid stats={stats} goalWeight={profile?.goal_weight ?? null} heightCm={profile?.height_cm ?? null} />
+      <StatsGrid stats={stats} goalWeight={profile?.goal_weight ?? null} heightCm={profile?.height_cm ?? null} targetDate={profile?.target_date ?? null} />
       {projection && (
         <InsightsCard
           projection={projection}

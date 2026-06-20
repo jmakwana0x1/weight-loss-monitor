@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import type { Projection } from "@/lib/regression";
 import { TrendingDown, TrendingUp, Target, BarChart2 } from "lucide-react";
 
@@ -8,8 +9,7 @@ function formatDate(d: Date) {
 }
 
 function formatSlope(slope: number) {
-  const abs = Math.abs(slope * 7).toFixed(2);
-  return `${abs} kg/week`;
+  return `${Math.abs(slope * 7).toFixed(2)} kg/week`;
 }
 
 interface InsightsCardProps {
@@ -24,7 +24,10 @@ export function InsightsCard({ projection, goalWeight, currentWeight }: Insights
   const weakFit = r2 < 0.4;
 
   return (
-    <section
+    <motion.section
+      initial={{ opacity: 0, y: 24 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: "easeOut", delay: 0.15 }}
       className="rounded-2xl border p-5 mb-6"
       style={{
         background: losing
@@ -48,7 +51,6 @@ export function InsightsCard({ projection, goalWeight, currentWeight }: Insights
         )}
       </div>
 
-      {/* Main headline */}
       {goalDate && daysToGoal && goalWeight ? (
         <div className="flex items-start gap-3 mb-4">
           <Target size={20} className="mt-0.5 shrink-0" style={{ color: "#22c55e" }} />
@@ -91,7 +93,6 @@ export function InsightsCard({ projection, goalWeight, currentWeight }: Insights
         </div>
       )}
 
-      {/* 30-day projection pill */}
       <div
         className="flex items-center justify-between rounded-xl px-4 py-2.5"
         style={{ background: "rgba(255,255,255,0.04)", border: "1px solid var(--glass-border)" }}
@@ -102,15 +103,14 @@ export function InsightsCard({ projection, goalWeight, currentWeight }: Insights
         <span
           className="font-mono font-bold tabular-nums text-sm"
           style={{
-            color:
-              currentWeight !== null && projectedWeightIn30Days < currentWeight
-                ? "#22c55e"
-                : "#ef4444",
+            color: currentWeight !== null && projectedWeightIn30Days < currentWeight
+              ? "#22c55e"
+              : "#ef4444",
           }}
         >
           {projectedWeightIn30Days} kg
         </span>
       </div>
-    </section>
+    </motion.section>
   );
 }

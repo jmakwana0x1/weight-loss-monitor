@@ -2,14 +2,13 @@
 
 import { useTransition } from "react";
 import { Trash2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { deleteEntry } from "@/app/actions";
 import type { WeightEntry } from "@/types/database";
 
 function formatDate(iso: string) {
   return new Intl.DateTimeFormat("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
+    day: "numeric", month: "short", year: "numeric",
   }).format(new Date(iso));
 }
 
@@ -28,25 +27,19 @@ function DeltaBadge({ delta }: { delta: number }) {
   );
 }
 
-function EntryRow({
-  entry,
-  delta,
-}: {
-  entry: WeightEntry;
-  delta: number | null;
-}) {
+function EntryRow({ entry, delta, index }: { entry: WeightEntry; delta: number | null; index: number }) {
   const [pending, startTransition] = useTransition();
 
   return (
-    <div
-      className="flex items-center gap-3 rounded-2xl border px-4 py-3 transition-opacity"
-      style={{
-        background: "var(--glass-bg)",
-        borderColor: "var(--glass-border)",
-        opacity: pending ? 0.4 : 1,
-      }}
+    <motion.div
+      layout
+      initial={{ opacity: 0, x: -16 }}
+      animate={{ opacity: pending ? 0.35 : 1, x: 0 }}
+      exit={{ opacity: 0, height: 0, marginBottom: 0, paddingTop: 0, paddingBottom: 0 }}
+      transition={{ duration: 0.28, delay: index * 0.04, ease: "easeOut" }}
+      className="flex items-center gap-3 rounded-2xl border px-4 py-3"
+      style={{ background: "var(--glass-bg)", borderColor: "var(--glass-border)" }}
     >
-      {/* date */}
       <div className="flex-1">
         <p className="text-sm" style={{ color: "var(--foreground)" }}>
           {formatDate(entry.logged_at)}
@@ -58,24 +51,17 @@ function EntryRow({
         )}
       </div>
 
-      {/* weight */}
       <span className="font-mono text-xl font-bold tabular-nums" style={{ color: "var(--foreground)" }}>
         {entry.weight.toFixed(1)}
-        <span className="ml-1 text-xs font-normal" style={{ color: "var(--muted)" }}>
-          kg
-        </span>
+        <span className="ml-1 text-xs font-normal" style={{ color: "var(--muted)" }}>kg</span>
       </span>
 
-      {/* delta */}
       <div className="w-14 text-right">
         {delta !== null && <DeltaBadge delta={delta} />}
       </div>
 
-      {/* delete */}
       <button
-        onClick={() =>
-          startTransition(() => deleteEntry(entry.id))
-        }
+        onClick={() => startTransition(() => deleteEntry(entry.id))}
         disabled={pending}
         className="ml-1 rounded-lg p-1.5 transition-all active:scale-90"
         style={{ color: "var(--muted)" }}
@@ -83,32 +69,37 @@ function EntryRow({
       >
         <Trash2 size={14} />
       </button>
-    </div>
+    </motion.div>
   );
 }
 
 export function EntriesList({ entries }: { entries: WeightEntry[] }) {
   if (entries.length === 0) {
     return (
-      <p className="text-center text-sm py-8" style={{ color: "var(--muted)" }}>
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.3 }}
+        className="text-center text-sm py-8"
+        style={{ color: "var(--muted)" }}
+      >
         No entries yet — log your first weight above.
-      </p>
+      </motion.p>
     );
   }
 
   return (
     <section className="flex flex-col gap-2">
-      <p
-        className="text-xs font-medium uppercase tracking-widest mb-2"
-        style={{ color: "var(--muted)" }}
-      >
+      <p className="text-xs font-medium uppercase tracking-widest mb-2" style={{ color: "var(--muted)" }}>
         History
       </p>
-      {entries.map((entry, i) => {
-        const prev = entries[i + 1];
-        const delta = prev ? entry.weight - prev.weight : null;
-        return <EntryRow key={entry.id} entry={entry} delta={delta} />;
-      })}
+      <AnimatePresence initial={false}>
+        {entries.map((entry, i) => {
+          const prev = entries[i + 1];
+          const delta = prev ? entry.weight - prev.weight : null;
+          return <EntryRow key={entry.id} entry={entry} delta={delta} index={i} />;
+        })}
+      </AnimatePresence>
     </section>
   );
 }

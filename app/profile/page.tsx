@@ -20,11 +20,11 @@ export default async function ProfilePage({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: profileRaw } = await (supabase as any)
     .from("profiles")
-    .select("goal_weight, height_cm")
+    .select("goal_weight, height_cm, target_date")
     .eq("id", user.id)
     .maybeSingle();
 
-  const profile = profileRaw as Pick<Profile, "goal_weight" | "height_cm"> | null;
+  const profile = profileRaw as (Pick<Profile, "goal_weight" | "height_cm"> & { target_date: string | null }) | null;
   const isOnboarding = !profile?.height_cm || !profile?.goal_weight;
 
   return (
@@ -106,6 +106,22 @@ export default async function ProfilePage({
               className="login-input rounded-xl border px-3 py-3 text-sm outline-none"
               style={{ background: "rgba(255,255,255,0.04)", borderColor: "var(--glass-border)", color: "var(--foreground)" }}
             />
+          </div>
+
+          {/* target date */}
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="target_date" className="text-xs font-medium uppercase tracking-widest" style={{ color: "var(--muted)" }}>
+              Target date <span className="normal-case font-normal">(optional)</span>
+            </label>
+            <input
+              id="target_date" name="target_date" type="date"
+              defaultValue={profile?.target_date ?? ""}
+              className="login-input rounded-xl border px-3 py-3 text-sm outline-none"
+              style={{ background: "rgba(255,255,255,0.04)", borderColor: "var(--glass-border)", color: "var(--foreground)", colorScheme: "dark" }}
+            />
+            <p className="text-xs" style={{ color: "var(--muted)" }}>
+              When you want to hit your goal. Leave blank to auto-calculate.
+            </p>
           </div>
 
           <button
