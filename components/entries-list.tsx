@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
-import { Trash2 } from "lucide-react";
+import { Trash2, Download } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { deleteEntry } from "@/app/actions";
 import type { WeightEntry } from "@/types/database";
@@ -90,9 +90,19 @@ export function EntriesList({ entries }: { entries: WeightEntry[] }) {
 
   return (
     <section className="flex flex-col gap-2">
-      <p className="text-xs font-medium uppercase tracking-widest mb-2" style={{ color: "var(--muted)" }}>
-        History
-      </p>
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-xs font-medium uppercase tracking-widest" style={{ color: "var(--muted)" }}>
+          History
+        </p>
+        <a
+          href="/api/export"
+          className="flex items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-xs transition-all active:scale-95"
+          style={{ background: "var(--glass-bg)", border: "1px solid var(--glass-border)", color: "var(--muted)" }}
+        >
+          <Download size={12} />
+          Export CSV
+        </a>
+      </div>
       <AnimatePresence initial={false}>
         {entries.map((entry, i) => {
           const prev = entries[i + 1];
