@@ -2,6 +2,7 @@
 
 import { CountUp } from "./count-up";
 import { bmiCategory, type Stats } from "@/lib/stats";
+import Link from "next/link";
 
 function StatCard({
   label,
@@ -36,33 +37,32 @@ function Empty() {
   return <span className="text-2xl font-bold" style={{ color: "var(--muted)" }}>—</span>;
 }
 
-interface StatsGridProps {
-  stats: Stats;
-  targetDate?: string | null;
-  goalWeight?: number | null;
+function ProfileHint({ text }: { text: string }) {
+  return (
+    <Link href="/profile">
+      <span className="text-xs underline-offset-2 hover:underline" style={{ color: "var(--muted)" }}>
+        {text} →
+      </span>
+    </Link>
+  );
 }
 
-export function StatsGrid({ stats, targetDate, goalWeight }: StatsGridProps) {
+interface StatsGridProps {
+  stats: Stats;
+  goalWeight?: number | null;
+  heightCm?: number | null;
+}
+
+export function StatsGrid({ stats, goalWeight, heightCm }: StatsGridProps) {
   const { currentWeight, weeklyRate, bmi, streak, daysToGoal } = stats;
   const rateColor = weeklyRate === null ? undefined : weeklyRate <= 0 ? "#22c55e" : "#ef4444";
   const bmiInfo = bmi ? bmiCategory(bmi) : null;
 
-  // Prefer calculated projection; fall back to user-set target date
-  const calcDate = daysToGoal
+  const goalDate = daysToGoal
     ? new Date(Date.now() + daysToGoal * 86400000).toLocaleDateString("en-GB", {
         day: "numeric", month: "short", year: "numeric",
       })
     : null;
-
-  const displayDate = calcDate ?? (targetDate
-    ? new Date(targetDate).toLocaleDateString("en-GB", {
-        day: "numeric", month: "short", year: "numeric",
-      })
-    : null);
-
-  const displayDays = daysToGoal ?? (targetDate
-    ? Math.round((new Date(targetDate).getTime() - Date.now()) / 86400000)
-    : null);
 
   return (
     <section className="mb-6">
@@ -71,15 +71,12 @@ export function StatsGrid({ stats, targetDate, goalWeight }: StatsGridProps) {
       </p>
 
       <div className="grid grid-cols-2 gap-2">
-        {/* Current weight — featured */}
+        {/* Current weight */}
         <StatCard label="Current weight" accent="var(--accent)" className="col-span-2">
           <div className="flex items-end gap-1">
             {currentWeight !== null ? (
               <>
-                <span
-                  className="text-5xl font-bold font-mono tabular-nums leading-none"
-                  style={{ color: "var(--accent)" }}
-                >
+                <span className="text-5xl font-bold font-mono tabular-nums leading-none" style={{ color: "var(--accent)" }}>
                   <CountUp to={currentWeight} decimals={1} duration={900} />
                 </span>
                 <span className="text-base mb-1" style={{ color: "var(--muted)" }}>kg</span>
@@ -100,7 +97,14 @@ export function StatsGrid({ stats, targetDate, goalWeight }: StatsGridProps) {
               </span>
               <span className="text-xs mb-1" style={{ color: "var(--muted)" }}>kg/wk</span>
             </div>
-          ) : <Empty />}
+          ) : (
+            <div>
+              <Empty />
+              <span className="text-xs mt-1 block" style={{ color: "var(--muted)" }}>
+                Log on 2+ days
+              </span>
+            </div>
+          )}
         </StatCard>
 
         {/* BMI */}
@@ -117,11 +121,9 @@ export function StatsGrid({ stats, targetDate, goalWeight }: StatsGridProps) {
               </span>
             </div>
           ) : (
-            <div>
+            <div className="flex flex-col gap-1">
               <Empty />
-              <span className="text-xs mt-1 block" style={{ color: "var(--muted)" }}>
-                Set height in profile
-              </span>
+              <ProfileHint text={!heightCm ? "Add your height" : "Set up profile"} />
             </div>
           )}
         </StatCard>
@@ -141,28 +143,31 @@ export function StatsGrid({ stats, targetDate, goalWeight }: StatsGridProps) {
           )}
         </StatCard>
 
-        {/* Days to goal */}
-        <StatCard label="Goal date" className="col-span-2" accent={displayDate ? "#22c55e" : undefined}>
-          {displayDate && displayDays !== null && displayDays > 0 ? (
+        {/* Goal date */}
+        <StatCard label="Goal date" className="col-span-2" accent={goalDate ? "#22c55e" : undefined}>
+          {goalDate && daysToGoal ? (
             <div className="flex items-center justify-between">
               <div className="flex items-end gap-1">
                 <span className="text-3xl font-bold font-mono tabular-nums leading-none" style={{ color: "#22c55e" }}>
-                  <CountUp to={displayDays} decimals={0} duration={1000} />
+                  <CountUp to={daysToGoal} decimals={0} duration={1000} />
                 </span>
                 <span className="text-xs mb-1" style={{ color: "var(--muted)" }}>days left</span>
               </div>
               <span className="text-sm font-medium" style={{ color: "rgba(255,255,255,0.5)" }}>
-                {displayDate}
+                {goalDate}
               </span>
             </div>
           ) : (
-            <span className="text-sm" style={{ color: "var(--muted)" }}>
-              {!goalWeight
-                ? "Set a goal weight in profile"
-                : !targetDate && !daysToGoal
-                ? "Log on 2+ different days or set a target date in profile"
-                : "—"}
-            </span>
+            <div className="flex flex-col gap-1">
+              <Empty />
+              {!goalWeight ? (
+                <ProfileHint text="Add your goal weight" />
+              ) : (
+                <span className="text-xs" style={{ color: "var(--muted)" }}>
+                  Log on 2+ different days to see projection
+                </span>
+              )}
+            </div>
           )}
         </StatCard>
       </div>

@@ -108,23 +108,6 @@ export default async function ProfilePage({
             />
           </div>
 
-          {/* target date */}
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="target_date" className="text-xs font-medium uppercase tracking-widest" style={{ color: "var(--muted)" }}>
-              Target date{" "}
-              <span className="normal-case font-normal">(optional)</span>
-            </label>
-            <input
-              id="target_date" name="target_date" type="date"
-              defaultValue={profile?.target_date ?? ""}
-              className="login-input rounded-xl border px-3 py-3 text-sm outline-none"
-              style={{ background: "rgba(255,255,255,0.04)", borderColor: "var(--glass-border)", color: "var(--foreground)", colorScheme: "dark" }}
-            />
-            <p className="text-xs" style={{ color: "var(--muted)" }}>
-              The date you want to hit your goal by. Leave blank to use the calculated projection.
-            </p>
-          </div>
-
           <button
             type="submit"
             className="mt-2 w-full rounded-xl py-3 text-sm font-semibold transition-all active:scale-95"

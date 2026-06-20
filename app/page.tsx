@@ -46,7 +46,7 @@ export default async function DashboardPage() {
     <main className="min-h-screen px-4 py-8" style={{ maxWidth: 480, margin: "0 auto" }}>
       <Header email={user.email ?? ""} />
       <QuickLog lastWeight={stats.currentWeight ?? undefined} />
-      <StatsGrid stats={stats} goalWeight={profile?.goal_weight ?? null} />
+      <StatsGrid stats={stats} goalWeight={profile?.goal_weight ?? null} heightCm={profile?.height_cm ?? null} />
       {projection && (
         <InsightsCard
           projection={projection}
