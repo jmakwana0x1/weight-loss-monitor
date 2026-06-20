@@ -6,19 +6,25 @@ import { LogOut, User } from "lucide-react";
 import Link from "next/link";
 import type { Profile } from "@/types/database";
 
-export default async function ProfilePage() {
+export default async function ProfilePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
+  const { error: pageError } = await searchParams;
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: profileRaw } = await (supabase as any)
     .from("profiles")
-    .select("goal_weight, height_cm, target_date")
+    .select("goal_weight, height_cm")
     .eq("id", user.id)
-    .single();
+    .maybeSingle();
 
-  const profile = profileRaw as (Pick<Profile, "goal_weight" | "height_cm"> & { target_date: string | null }) | null;
+  const profile = profileRaw as Pick<Profile, "goal_weight" | "height_cm"> | null;
   const isOnboarding = !profile?.height_cm || !profile?.goal_weight;
 
   return (
@@ -60,6 +66,15 @@ export default async function ProfilePage() {
           <p className="text-sm mb-6" style={{ color: "var(--muted)" }}>
             Just a few quick details and you&apos;re ready to start tracking.
           </p>
+        )}
+
+        {pageError && (
+          <div
+            className="mb-5 rounded-xl border px-4 py-3 text-sm"
+            style={{ borderColor: "#ef4444", background: "rgba(239,68,68,0.08)", color: "#ef4444" }}
+          >
+            {pageError}
+          </div>
         )}
 
         <form action={updateProfile} className="flex flex-col gap-5">

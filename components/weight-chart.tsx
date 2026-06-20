@@ -51,17 +51,14 @@ interface WeightChartProps {
 }
 
 export function WeightChart({ data, goalWeight }: WeightChartProps) {
-  if (data.length < 2) {
+  if (data.length === 0) {
     return (
       <div
         className="flex items-center justify-center rounded-2xl border py-16 mb-6"
-        style={{
-          background: "var(--glass-bg)",
-          borderColor: "var(--glass-border)",
-        }}
+        style={{ background: "var(--glass-bg)", borderColor: "var(--glass-border)" }}
       >
         <p className="text-sm" style={{ color: "#71717a" }}>
-          Log entries on at least 2 different days to see your chart.
+          Log your first weight to see your chart.
         </p>
       </div>
     );

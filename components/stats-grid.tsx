@@ -38,20 +38,31 @@ function Empty() {
 
 interface StatsGridProps {
   stats: Stats;
+  targetDate?: string | null;
+  goalWeight?: number | null;
 }
 
-export function StatsGrid({ stats }: StatsGridProps) {
+export function StatsGrid({ stats, targetDate, goalWeight }: StatsGridProps) {
   const { currentWeight, weeklyRate, bmi, streak, daysToGoal } = stats;
   const rateColor = weeklyRate === null ? undefined : weeklyRate <= 0 ? "#22c55e" : "#ef4444";
   const bmiInfo = bmi ? bmiCategory(bmi) : null;
 
-  const goalDate = daysToGoal
+  // Prefer calculated projection; fall back to user-set target date
+  const calcDate = daysToGoal
     ? new Date(Date.now() + daysToGoal * 86400000).toLocaleDateString("en-GB", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
+        day: "numeric", month: "short", year: "numeric",
       })
     : null;
+
+  const displayDate = calcDate ?? (targetDate
+    ? new Date(targetDate).toLocaleDateString("en-GB", {
+        day: "numeric", month: "short", year: "numeric",
+      })
+    : null);
+
+  const displayDays = daysToGoal ?? (targetDate
+    ? Math.round((new Date(targetDate).getTime() - Date.now()) / 86400000)
+    : null);
 
   return (
     <section className="mb-6">
@@ -131,23 +142,25 @@ export function StatsGrid({ stats }: StatsGridProps) {
         </StatCard>
 
         {/* Days to goal */}
-        <StatCard label="Goal date" className="col-span-2" accent={daysToGoal ? "#22c55e" : undefined}>
-          {goalDate && daysToGoal ? (
+        <StatCard label="Goal date" className="col-span-2" accent={displayDate ? "#22c55e" : undefined}>
+          {displayDate && displayDays !== null && displayDays > 0 ? (
             <div className="flex items-center justify-between">
               <div className="flex items-end gap-1">
                 <span className="text-3xl font-bold font-mono tabular-nums leading-none" style={{ color: "#22c55e" }}>
-                  <CountUp to={daysToGoal} decimals={0} duration={1000} />
+                  <CountUp to={displayDays} decimals={0} duration={1000} />
                 </span>
                 <span className="text-xs mb-1" style={{ color: "var(--muted)" }}>days left</span>
               </div>
               <span className="text-sm font-medium" style={{ color: "rgba(255,255,255,0.5)" }}>
-                {goalDate}
+                {displayDate}
               </span>
             </div>
           ) : (
             <span className="text-sm" style={{ color: "var(--muted)" }}>
-              {stats.currentWeight && !daysToGoal
-                ? "Set a goal weight to see your target date"
+              {!goalWeight
+                ? "Set a goal weight in profile"
+                : !targetDate && !daysToGoal
+                ? "Log on 2+ different days or set a target date in profile"
                 : "—"}
             </span>
           )}
