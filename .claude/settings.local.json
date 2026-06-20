@@ -5,7 +5,8 @@
       "Bash(wsl *)",
       "PowerShell(wsl -d Ubuntu-24.04 -- bash -c \"source ~/.nvm/nvm.sh && nvm use 22 && cd /home/jmakwana01/v4-new/waitloss-monitor && npm run build 2>&1\")",
       "PowerShell(wsl -d Ubuntu-24.04 -- bash -c \"ls /home/jmakwana01/v4-new/waitloss-monitor/pages 2>&1; ls /home/jmakwana01/v4-new/waitloss-monitor/app 2>&1\")",
-      "PowerShell(wsl -d Ubuntu-24.04 -- bash -c \"source ~/.nvm/nvm.sh && nvm use 22 && cd /home/jmakwana01/v4-new/waitloss-monitor && rm -rf .next && npm run build 2>&1\")"
+      "PowerShell(wsl -d Ubuntu-24.04 -- bash -c \"source ~/.nvm/nvm.sh && nvm use 22 && cd /home/jmakwana01/v4-new/waitloss-monitor && rm -rf .next && npm run build 2>&1\")",
+      "PowerShell(wsl -d Ubuntu-24.04 -- bash -c \"source ~/.nvm/nvm.sh && nvm use 22 && cd /home/jmakwana01/v4-new/waitloss-monitor && npm install next@latest 2>&1 | tail -8\")"
     ]
   }
 }
