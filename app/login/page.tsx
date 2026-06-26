@@ -8,39 +8,44 @@ export default async function LoginPage({
   const { error } = await searchParams;
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center px-4">
-      <div aria-hidden className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div
-          className="absolute -top-40 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full blur-3xl opacity-20"
-          style={{ background: "var(--accent)" }}
-        />
-        <div
-          className="absolute bottom-0 right-0 h-72 w-72 rounded-full blur-3xl opacity-10"
-          style={{ background: "var(--accent)" }}
-        />
-      </div>
-
+    <main style={{ width: 430, maxWidth: "100%", margin: "0 auto", padding: "0 18px", minHeight: "100vh" }}>
       <div
-        className="relative w-full max-w-sm rounded-2xl border p-8 shadow-2xl"
-        style={{
-          background: "var(--glass-bg)",
-          borderColor: "var(--glass-border)",
-          backdropFilter: "blur(20px)",
-        }}
+        className="relative flex flex-col justify-center"
+        style={{ minHeight: "100vh", animation: "rise .5s ease both" }}
       >
-        <div className="mb-8 text-center">
-          <span
-            className="text-2xl font-bold tracking-tight"
-            style={{ color: "var(--accent)" }}
+        {/* giant watermark */}
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <div
+            className="font-black select-none"
+            style={{ fontSize: 300, lineHeight: 1, color: "rgba(255,255,255,0.018)", letterSpacing: "-.06em" }}
           >
-            Weight Loss Monitor
-          </span>
-          <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>
-            Track your journey, one weigh-in at a time.
-          </p>
+            88
+          </div>
         </div>
 
-        <GoogleSignInButton error={error} />
+        <div className="relative">
+          <div className="font-mono" style={{ fontSize: 10, letterSpacing: ".34em", color: "var(--muted-2)", marginBottom: 18 }}>
+            PERSONAL MASS INSTRUMENT
+          </div>
+          <div className="flex items-end gap-2.5">
+            <span className="font-black" style={{ fontSize: 96, lineHeight: 0.82, letterSpacing: "-.05em" }}>TARE</span>
+            <span style={{ width: 13, height: 13, background: "var(--accent)", marginBottom: 14, boxShadow: "0 0 22px var(--accent-soft)" }} />
+          </div>
+          <p className="font-medium" style={{ fontSize: 17, color: "var(--muted)", marginTop: 18, maxWidth: 300, lineHeight: 1.35 }}>
+            Track the <span style={{ color: "var(--accent)" }}>trend</span>, not the noise. Weigh in once a day — we draw the line.
+          </p>
+
+          <div style={{ marginTop: 46 }}>
+            <GoogleSignInButton error={error} />
+          </div>
+        </div>
+
+        <div
+          className="absolute font-mono"
+          style={{ bottom: 38, left: 0, fontSize: 10, letterSpacing: ".14em", color: "#3a4035" }}
+        >
+          SECURE · GOOGLE OAUTH · NO PASSWORDS
+        </div>
       </div>
     </main>
   );

@@ -41,17 +41,32 @@ export default async function DashboardPage() {
   const chartData  = buildChartData(entries);
   const stats      = computeStats(entries, profile?.height_cm ?? null, profile?.goal_weight ?? null);
   const projection = linearRegression(entries, profile?.goal_weight ?? null);
+  const minWeight  = entries.length ? Math.min(...entries.map((e) => e.weight)) : null;
 
   return (
-    <main className="min-h-screen px-4 py-8" style={{ maxWidth: 480, margin: "0 auto" }}>
+    <main
+      className="min-h-screen"
+      style={{ width: 430, maxWidth: "100%", margin: "0 auto", padding: "26px 18px 64px" }}
+    >
       <Header email={user.email ?? ""} />
-      <QuickLog lastWeight={stats.currentWeight ?? undefined} />
-      <StatsGrid stats={stats} goalWeight={profile?.goal_weight ?? null} heightCm={profile?.height_cm ?? null} targetDate={profile?.target_date ?? null} />
+      <QuickLog
+        lastWeight={stats.currentWeight ?? undefined}
+        goalWeight={profile?.goal_weight ?? null}
+        minWeight={minWeight}
+      />
+      <StatsGrid
+        stats={stats}
+        goalWeight={profile?.goal_weight ?? null}
+        heightCm={profile?.height_cm ?? null}
+        targetDate={profile?.target_date ?? null}
+        startWeight={entries.length ? entries[entries.length - 1].weight : null}
+      />
       {projection && (
         <InsightsCard
           projection={projection}
           goalWeight={profile?.goal_weight ?? null}
           currentWeight={stats.currentWeight}
+          startWeight={entries.length ? entries[entries.length - 1].weight : null}
         />
       )}
       <WeightChartDynamic data={chartData} goalWeight={profile?.goal_weight} />

@@ -2,9 +2,27 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import { updateProfile } from "./actions";
 import { signOut } from "@/app/login/actions";
-import { LogOut, User } from "lucide-react";
+import { LogOut } from "lucide-react";
 import Link from "next/link";
 import type { Profile } from "@/types/database";
+
+const FIELD: React.CSSProperties = {
+  background: "var(--surface)",
+  border: "1px solid var(--border)",
+  borderRadius: 10,
+  padding: "16px 18px",
+};
+
+const BIG_INPUT: React.CSSProperties = {
+  marginTop: 6,
+  width: "100%",
+  background: "transparent",
+  border: "none",
+  fontWeight: 800,
+  fontSize: 40,
+  letterSpacing: "-.03em",
+  outline: "none",
+};
 
 export default async function ProfilePage({
   searchParams,
@@ -28,117 +46,91 @@ export default async function ProfilePage({
   const isOnboarding = !profile?.height_cm || !profile?.goal_weight;
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center px-4">
-      <div aria-hidden className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div
-          className="absolute -top-40 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full blur-3xl opacity-20"
-          style={{ background: "var(--accent)" }}
-        />
-        <div
-          className="absolute bottom-0 right-0 h-72 w-72 rounded-full blur-3xl opacity-10"
-          style={{ background: "var(--accent)" }}
-        />
-      </div>
-
-      <div
-        className="relative w-full max-w-sm rounded-2xl border p-8 shadow-2xl"
-        style={{
-          background: "var(--glass-bg)",
-          borderColor: "var(--glass-border)",
-          backdropFilter: "blur(20px)",
-        }}
-      >
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-2">
-            <User size={16} style={{ color: "var(--accent)" }} />
-            <span className="text-lg font-bold tracking-tight" style={{ color: "var(--accent)" }}>
-              {isOnboarding ? "Set up your profile" : "Profile settings"}
-            </span>
-          </div>
+    <main style={{ width: 430, maxWidth: "100%", margin: "0 auto", padding: "0 18px", minHeight: "100vh" }}>
+      <div className="flex flex-col justify-center" style={{ minHeight: "100vh", animation: "rise .5s ease both", paddingTop: 40, paddingBottom: 40 }}>
+        <div className="flex items-center justify-between">
+          <span className="font-mono" style={{ fontSize: 10, letterSpacing: ".28em", color: "var(--muted-2)" }}>
+            {isOnboarding ? "STEP 01 / 01 — FIRST RUN" : "PROFILE SETTINGS"}
+          </span>
           {!isOnboarding && (
-            <Link href="/" className="text-xs transition-opacity hover:opacity-70" style={{ color: "var(--muted)" }}>
-              ← Back
+            <Link href="/" className="font-mono transition-opacity hover:opacity-70" style={{ fontSize: 10, color: "var(--muted)", letterSpacing: ".1em" }}>
+              ← BACK
             </Link>
           )}
         </div>
 
-        {isOnboarding && (
-          <p className="text-sm mb-6" style={{ color: "var(--muted)" }}>
-            Just a few quick details and you&apos;re ready to start tracking.
-          </p>
-        )}
+        <h1 className="font-black" style={{ fontSize: 46, lineHeight: 0.95, letterSpacing: "-.035em", marginTop: 12 }}>
+          {isOnboarding ? (<>Set your<br />baseline.</>) : (<>Your<br />numbers.</>)}
+        </h1>
+        <p style={{ fontSize: 15, color: "var(--muted)", marginTop: 14, maxWidth: 300, lineHeight: 1.4 }}>
+          A few numbers so we can chart your trend and project your goal date.
+        </p>
 
         {pageError && (
           <div
-            className="mb-5 rounded-xl border px-4 py-3 text-sm"
-            style={{ borderColor: "#ef4444", background: "rgba(239,68,68,0.08)", color: "#ef4444" }}
+            className="flex items-center gap-2.5"
+            style={{ marginTop: 20, background: "rgba(255,91,69,0.08)", border: "1px solid rgba(255,91,69,0.3)", borderRadius: 8, padding: "11px 13px" }}
           >
-            {pageError}
+            <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--danger)" }} />
+            <span style={{ fontSize: 13, color: "#FF8A78" }}>{pageError}</span>
           </div>
         )}
 
-        <form action={updateProfile} className="flex flex-col gap-5">
-          {/* height */}
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="height_cm" className="text-xs font-medium uppercase tracking-widest" style={{ color: "var(--muted)" }}>
-              Height (cm)
-            </label>
+        <form action={updateProfile} className="flex flex-col gap-3.5" style={{ marginTop: 32 }}>
+          <div style={FIELD}>
+            <div className="flex items-center justify-between">
+              <label htmlFor="height_cm" className="font-mono" style={{ fontSize: 10, letterSpacing: ".16em", color: "var(--muted-2)" }}>HEIGHT</label>
+              <span className="font-mono" style={{ fontSize: 11, color: "var(--muted-2)" }}>CM</span>
+            </div>
             <input
-              id="height_cm" name="height_cm" type="number"
-              step="0.1" min="50" max="300"
-              defaultValue={profile?.height_cm ?? ""}
-              placeholder="e.g. 175" required
-              className="login-input rounded-xl border px-3 py-3 text-sm outline-none"
-              style={{ background: "rgba(255,255,255,0.04)", borderColor: "var(--glass-border)", color: "var(--foreground)" }}
+              id="height_cm" name="height_cm" type="number" inputMode="decimal"
+              step="0.1" min="50" max="300" required
+              defaultValue={profile?.height_cm ?? ""} placeholder="178"
+              style={{ ...BIG_INPUT, color: "var(--foreground)" }}
             />
           </div>
 
-          {/* goal weight */}
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="goal_weight" className="text-xs font-medium uppercase tracking-widest" style={{ color: "var(--muted)" }}>
-              Goal weight (kg)
-            </label>
+          <div style={FIELD}>
+            <div className="flex items-center justify-between">
+              <label htmlFor="goal_weight" className="font-mono" style={{ fontSize: 10, letterSpacing: ".16em", color: "var(--accent)" }}>GOAL WEIGHT</label>
+              <span className="font-mono" style={{ fontSize: 11, color: "var(--muted-2)" }}>KG</span>
+            </div>
             <input
-              id="goal_weight" name="goal_weight" type="number"
-              step="0.1" min="20" max="999"
-              defaultValue={profile?.goal_weight ?? ""}
-              placeholder="e.g. 70" required
-              className="login-input rounded-xl border px-3 py-3 text-sm outline-none"
-              style={{ background: "rgba(255,255,255,0.04)", borderColor: "var(--glass-border)", color: "var(--foreground)" }}
+              id="goal_weight" name="goal_weight" type="number" inputMode="decimal"
+              step="0.1" min="20" max="999" required
+              defaultValue={profile?.goal_weight ?? ""} placeholder="78"
+              style={{ ...BIG_INPUT, color: "var(--accent)" }}
             />
           </div>
 
-          {/* target date */}
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="target_date" className="text-xs font-medium uppercase tracking-widest" style={{ color: "var(--muted)" }}>
-              Target date <span className="normal-case font-normal">(optional)</span>
-            </label>
+          <div style={FIELD}>
+            <div className="flex items-center justify-between">
+              <label htmlFor="target_date" className="font-mono" style={{ fontSize: 10, letterSpacing: ".16em", color: "var(--muted-2)" }}>TARGET DATE</label>
+              <span className="font-mono" style={{ fontSize: 11, color: "var(--muted-3)" }}>OPTIONAL</span>
+            </div>
             <input
               id="target_date" name="target_date" type="date"
               defaultValue={profile?.target_date ?? ""}
-              className="login-input rounded-xl border px-3 py-3 text-sm outline-none"
-              style={{ background: "rgba(255,255,255,0.04)", borderColor: "var(--glass-border)", color: "var(--foreground)", colorScheme: "dark" }}
+              className="font-mono"
+              style={{ marginTop: 8, width: "100%", background: "transparent", border: "none", outline: "none", color: "var(--foreground)", fontWeight: 700, fontSize: 20, colorScheme: "dark" }}
             />
-            <p className="text-xs" style={{ color: "var(--muted)" }}>
-              When you want to hit your goal. Leave blank to auto-calculate.
-            </p>
           </div>
 
           <button
             type="submit"
-            className="mt-2 w-full rounded-xl py-3 text-sm font-semibold transition-all active:scale-95"
-            style={{ background: "var(--accent)", color: "#000" }}
+            className="flex items-center justify-between font-extrabold transition-all active:scale-[0.99]"
+            style={{ marginTop: 10, background: "var(--accent)", color: "#0b0d09", height: 56, borderRadius: 9, padding: "0 22px", fontSize: 16, letterSpacing: "-.01em", boxShadow: "0 10px 34px var(--accent-soft)" }}
           >
-            {isOnboarding ? "Get started" : "Save changes"}
+            <span>{isOnboarding ? "Start tracking" : "Save changes"}</span>
+            <span style={{ fontSize: 22 }}>→</span>
           </button>
         </form>
 
-        <div className="mt-6 border-t pt-4" style={{ borderColor: "var(--glass-border)" }}>
-          <p className="text-xs mb-3" style={{ color: "var(--muted)" }}>{user.email}</p>
+        <div className="flex items-center justify-between" style={{ marginTop: 24, borderTop: "1px solid var(--border)", paddingTop: 16 }}>
+          <span className="font-mono" style={{ fontSize: 10, color: "var(--muted-2)", letterSpacing: ".04em" }}>{user.email}</span>
           <form action={signOut}>
-            <button type="submit" className="flex items-center gap-1.5 text-xs transition-opacity hover:opacity-70" style={{ color: "var(--muted)" }}>
-              <LogOut size={12} />
-              Sign out
+            <button type="submit" className="flex items-center gap-1.5 font-mono transition-opacity hover:opacity-70" style={{ fontSize: 10, color: "var(--muted)", letterSpacing: ".1em" }}>
+              <LogOut size={12} /> SIGN OUT
             </button>
           </form>
         </div>
