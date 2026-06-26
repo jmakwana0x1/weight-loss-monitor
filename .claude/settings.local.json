@@ -12,7 +12,9 @@
       "Bash(command -v npm)",
       "Bash(npm install *)",
       "Bash(git add *)",
-      "Bash(git -c core.editor=true rebase --continue)"
+      "Bash(git -c core.editor=true rebase --continue)",
+      "Bash(git pull *)",
+      "Bash(git commit -m 'chore: update local settings permissions *)"
     ]
   }
 }
